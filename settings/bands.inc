@@ -1,0 +1,10 @@
+010000
+0
+[0]
+Measure=Plugin
+Plugin=AudioAnalyzer
+Type=Child
+Parent=P
+ValueId=0
+Index=0
+Channel=#Channel#
