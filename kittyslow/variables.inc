@@ -104,7 +104,7 @@ MinSensitivity=-240
 
 ; Maximum band sensitivity
 ; Real, <= 0.0
-MaxSensitivity=-20
+MaxSensitivity=-12
 
 ; ACCURACY
 ; ----------------------------------------
