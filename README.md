@@ -6,8 +6,6 @@
 An experimental feature-oriented visualizer for Rainmeter.
 Based off of the original Vector by Kodikuu.
 
-Please download the latest version of the [AudioAnalyzer plugin](https://github.com/d-uzlov/Rainmeter-Plugins-by-rxtd) before downloading this skin.
-
 ---
 
 **Credits**
