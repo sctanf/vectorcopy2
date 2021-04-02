@@ -1,5 +1,5 @@
 function Initialize()
-	local version = '010100'
+	local version = '010101'
 	local parent = [=[
 [P]
 Measure=Plugin
