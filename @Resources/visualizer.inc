@@ -9,7 +9,7 @@ ContextTitle3=Calibrate Manual
 ContextAction3=[!CommandMeasure Processor calibrate(-1)][!SetOption Rainmeter ContextTitle "Finish Calibration"][!SetOption Rainmeter ContextAction "[!CommandMeasure Processor calibrate(-1)]"][!SetOption Rainmeter ContextTitle2 "Cancel Calibration"][!SetOption Rainmeter ContextAction2 "[!CommandMeasure Processor calibrate(0)]"][!SetOption Rainmeter ContextTitle3 ""][!SkinCustomMenu]
 ContextTitle4=---
 ContextTitle5=Settings...
-ContextAction5=[!ActivateConfig "#ROOTCONFIG#\Settings"]
+ContextAction5=["#CURRENTPATH#variables.inc"]
 ContextTitle6=Rainmeter...
 ContextAction6=[!SkinMenu]
 @IncludeDefaultVariables=#@#defaultvariables.inc
@@ -26,10 +26,10 @@ OnUpdateAction=[!Delay 0][!Update]
 Measure=Plugin
 Plugin=Chameleon
 Type=Desktop
-OnChangeAction=[!UpdateMeasure CR][!UpdateMeasure CG][!UpdateMeasure CB]
+OnChangeAction=[!UpdateMeasure C1][!UpdateMeasure C2][!UpdateMeasure C3]
 ContextAwareColors=0
 
-[CR]
+[C1]
 Measure=Plugin
 Plugin=Chameleon
 Parent=Desktop
@@ -38,7 +38,7 @@ Format=Dec
 UpdateDivider=-1
 RegExpSubstitute=1
 Substitute="(.*),.*,.*":"\1"
-[CG]
+[C2]
 Measure=Plugin
 Plugin=Chameleon
 Parent=Desktop
@@ -47,7 +47,7 @@ Format=Dec
 UpdateDivider=-1
 RegExpSubstitute=1
 Substitute=".*,(.*),.*":"\1"
-[CB]
+[C3]
 Measure=Plugin
 Plugin=Chameleon
 Parent=Desktop
@@ -56,27 +56,6 @@ Format=Dec
 UpdateDivider=-1
 RegExpSubstitute=1
 Substitute=".*,.*,(.*)":"\1"
-
-[R]
-Measure=Calc
-Formula=[&CR]
-AverageSize=62
-DynamicVariables=1
-[G]
-Measure=Calc
-Formula=[&CG]
-AverageSize=62
-DynamicVariables=1
-[B]
-Measure=Calc
-Formula=[&CB]
-AverageSize=62
-DynamicVariables=1
-
-[RGB]
-Measure=String
-String=[R],[G],[B]
-DynamicVariables=1
 
 [Volume]
 Measure=Plugin

@@ -1,5 +1,5 @@
 function Initialize()
-	local version = '010101'
+	local version = '010102'
 	local parent = [=[
 [P]
 Measure=Plugin
@@ -90,35 +90,7 @@ Channel=#Channel#
 		file:close()
 	end
 	
-	--display calibration file
-	if bCal then
-		local bCalMax = 0
-		for i=1,bands do
-			if bCal[i] - 1 > bCalMax then bCalMax = bCal[i] - 1 end
-		end
-		SKIN:Bang('!SetOption', 'Calibration', 'Path', '0,0|LineTo0,0')
-		SKIN:Bang('!SetOption', 'Calibration', 'Shape', 'PathPath|StrokeColorFFFFFF|StrokeWidth1')
-		path = {'0,' .. (1-(bCal[1]-1)/bCalMax)*32}
-		for i=1,bands do
-			path[i*2] = '|LineTo' .. (i-1)*500/(bands-1) .. ','
-		end
-		local p = path
-		for i=1,bands do
-			p[i*2+1] = (1-(bCal[i]-1)/bCalMax)*32
-		end
-		SKIN:Bang('!SetOption', 'Calibration', 'Path', table.concat(p))
-	end
-	
 	--timer
-	st = 0
-	el = 0
-	st2 = os.clock()
-	el2 = 0
-	st3 = os.clock()
-	el3 = 0
-	st4 = os.clock()
-	el4 = 0
-	eli = 0
 	frametimeStart = os.clock()
 	frametimeIndex = 0
 	frametimeAvg = {}
@@ -133,6 +105,14 @@ Channel=#Channel#
 	
 	colorType = string.upper(SKIN:GetVariable('Color', 'CUSTOM'))
 	colorType = ((colorType == "CUSTOM" and 1) or (colorType == "CHAMELEON" and 2)) or 1
+	
+	colorAvgConst = 1
+	colorAvgSizeOld = 0
+	colorAvgSize = 1
+	colorAvgIndex = 0
+	
+	colorSrc = {}
+	colorAvg = {}
 	
 	scale = SKIN:GetVariable('Scale', 1)
 	
@@ -185,23 +165,27 @@ Channel=#Channel#
 		end
 	end
 	
-	if colorType == 1 then
-		SKIN:Bang('!SetOption', 'Shape', 'Color', 'FillColor#Custom#,#Alpha#|StrokeWidth0')
-	elseif colorType == 2 then
-		SKIN:Bang('!SetOption', 'Shape', 'Color', 'FillColor[RGB],#Alpha#|StrokeWidth0')
+	for i=1,1000 do
+		colorAvg[i] = {}
 	end
 	
+	for i=1,3 do
+		colorSrc[i] = SKIN:GetMeasure('C' .. i)
+	end
+	
+	if colorType == 1 then
+		colorOut = SKIN:GetVariable('Custom')
+	elseif colorType == 2 then
+		colorOut = colorSrc[1]:GetValue() .. ',' .. colorSrc[2]:GetValue() .. ',' ..colorSrc[3]:GetValue()
+	end
+	SKIN:Bang('!SetOption', 'Shape', 'Color', 'FillColor' .. colorOut .. ',#Alpha#|StrokeWidth0')
+	
 	if visType == 1 then
-		SKIN:Bang('!SetOption', 'Shape', 'TransformationMatrix', '(Cos(-#Angle#%360*Pi/180));(-Sin(-#Angle#%360*Pi/180));(Sin(-#Angle#%360*Pi/180));(Cos(-#Angle#%360*Pi/180));(((90<#Angle#%360)&(#Angle#%360<270)?Abs(Cos(#Angle#%360*Pi/180))*(#BarWidth#+#barSpacing#)*#Bands#*#Scale#:0)+((0<#Angle#%360)&(#Angle#%360<180)?Abs(Sin(#Angle#%360*Pi/180))*#Height#*#Scale#:0));(((180<#Angle#%360)&(#Angle#%360<360)?Abs(Sin(#Angle#%360*Pi/180))*(#BarWidth#+#barSpacing#)*#Bands#*#Scale#:0)+((90<#Angle#%360)&(#Angle#%360<270)?Abs(Cos(#Angle#%360*Pi/180))*#Height#*#Scale#:0))')
 		SKIN:Bang('!SetOption', 'Shape', 'Shape', 'Rectangle0,0,0,0')
 		bar = {'Rectangle', '', ',' .. height*scale .. ',' .. barWidth*scale .. ',', '', ',' .. barRoundSize*scale .. '|ExtendColor'}
 	elseif visType == 2 then
-		SKIN:Bang('!SetOption', 'Shape', 'TransformationMatrix', '(Cos(-#Angle#%360*Pi/180));(-Sin(-#Angle#%360*Pi/180));(Sin(-#Angle#%360*Pi/180));(Cos(-#Angle#%360*Pi/180));(((90<#Angle#%360)&(#Angle#%360<270)?Abs(Cos(#Angle#%360*Pi/180))*#Width#*#Scale#:0)+((0<#Angle#%360)&(#Angle#%360<180)?Abs(Sin(#Angle#%360*Pi/180))*#Height#*#Scale#:0));(((180<#Angle#%360)&(#Angle#%360<360)?Abs(Sin(#Angle#%360*Pi/180))*#Width#*#Scale#:0)+((90<#Angle#%360)&(#Angle#%360<270)?Abs(Cos(#Angle#%360*Pi/180))*#Height#*#Scale#:0))')
 		SKIN:Bang('!SetOption', 'Shape', 'Path', '0,0|LineTo0,0')
 		SKIN:Bang('!SetOption', 'Shape', 'Shape', 'PathPath|ExtendColor')
-		--SKIN:Bang('!SetOption', 'Shape', 'Shape', 'PathPath|FillColor000000|StrokeWidth0')
-		--SKIN:Bang('!SetOption', 'Shape', 'Shape2', 'Rectangle0,0,' .. width*scale .. ',' .. height*scale .. '|ExtendColor')
-		--SKIN:Bang('!SetOption', 'Shape', 'Shape3', 'Combine Shape2|IntersectShape')
 		path = {'0,' .. height*scale}
 		for i=1,bands do
 			path[i*2] = '|LineTo' .. (i-1)*width/(bands-1)*scale .. ','
@@ -252,14 +236,9 @@ function Update()
 		return
 	end
 	
-	--timer
-	st=os.clock()
-	--timer
-	
 	local c = {}
 	local bCalc = {}
-	--avgIndex = (avgIndex + 1) % avgSize
-	avgIndex = 0
+	avgIndex = (avgIndex + 1) % avgSize
 	k = avgIndex + 1
 	for i=1,bands do
 		local b = bSrc[i]:GetValue()
@@ -273,46 +252,11 @@ function Update()
 		end
 	end
 	bAvg[k] = bCalc
-	--for i=avgSize-1,1,-1 do
-	--	bAvg[i+1] = bAvg[i]
-	--end
-	--bAvg[k] = bCalc
-	
-	--timer
-	--el=os.clock()-st;
-	el=(el*eli+(os.clock()-st))/(eli+1);
-	st4=os.clock()
-	--timer
 	
 	local bMax = 0
 	if tonumber(avgSize) > 1 then
 		for i=1,bands do
 			local out = 0
-			--if avgType == 1 then
-			--	for j=1,avgSize do
-			--		out = out + (bAvg[j][i] or 0)
-			--	end
-			--	out = out * avgConst
-			--elseif avgType == 2 then
-			--	k = avgIndex + 1
-			--	for j=1,avgSize do
-			--		out = out + (bAvg[k][i] or 0) * j
-			--		k = k % avgSize + 1
-			--	end
-			--	out = out * avgConst
-			--elseif avgType == 3 then
-			--	k = avgIndex + 1
-			--	avgWeight = 0
-			--	weight = 1
-			--	for j=1,avgSize do
-			--		out = out + (bAvg[k][i] or 0) * weight
-			--		weight = weight * avgBase
-			--		k = k % avgSize + 1
-			--	end
-			--	out = out * avgConst
-			--else
-			--	out = bAvg[k][i]
-			--end
 			if avgType == 1 then
 				for j=avgSize,1,-1 do
 					out = out + (bAvg[j][i] or 0)
@@ -345,22 +289,32 @@ function Update()
 		end
 		c = bAvg[k]
 	end
-	SKIN:Bang('!SetOption','TimeMeter','Shape14','Rectangle0,0,' .. math.min((bMax-1)*500,500) .. ',8|FillColorFFFFFF|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape16','Rectangle0,0,' .. math.min((bMax-2)*500,500) .. ',8|FillColorFF0000|StrokeWidth0')
-	SKIN:Bang('!SetOption','Multiplier','Text',string.format("%.2f",bMax));
 	
-	--timer
-	--el4=os.clock()-st4;
-	el4=(el4*eli+(os.clock()-st4))/(eli+1);
-	st2=os.clock()
-	--timer
+	local color = {}
+	colorAvgIndex = (colorAvgIndex + 1) % colorAvgSize
+	l = colorAvgIndex + 1
+	for i=1,3 do
+		color[i] = tonumber(colorSrc[i]:GetStringValue())
+	end
+	colorAvg[l] = color
+	
+	if colorType == 2 then
+		for i=1,3 do
+			local out = 0
+			for j=colorAvgSize,1,-1 do
+				out = out + (colorAvg[j][i] or 0)
+			end
+			color[i] = out * colorAvgConst
+		end
+		colorOut = color[1] .. ',' .. color[2] .. ',' ..color[3]
+	end
 	
 	if bMax < 1/1000 then
 		SKIN:Bang('!DisableMeasure', 'Update')
-		--SKIN:Bang('!HideMeter', 'Shape')
 	else
 		SKIN:Bang('!EnableMeasure', 'Update')
-		if bMax > 1 then print(bMax) else bMax = 1 end
+		if bMax < 1 then bMax = 1 end
+		SKIN:Bang('!SetOption', 'Shape', 'Color', 'FillColor' .. colorOut .. ',#Alpha#|StrokeWidth0')
 		if invert == 1 then
 			if visType == 1 then
 				local p = bar
@@ -394,50 +348,11 @@ function Update()
 				SKIN:Bang('!SetOption', 'Shape', 'Path', table.concat(p))
 			end
 		end
-		--SKIN:Bang('!ShowMeter', 'Shape')
 	end
 	
 	--frametime
 	frametimeIndex=frametimeIndex%frametimeSize+1;frametimeAvg[frametimeIndex]=os.clock()-frametimeStart;frametime=0;for i=1,frametimeSize do frametime=frametime+frametimeAvg[i] end;frametime=frametime/frametimeSize;frametimeStart=os.clock()
 	--frametime
-	
-	--timer
-	--el2=os.clock()-st2;el3=os.clock()-st3;
-	el2=(el2*eli+(os.clock()-st2))/(eli+1);el3=(el3*eli+(os.clock()-st3))/(eli+1);
-	if not last then
-		last = 0
-		last2 = 0
-		last3 = 0
-		last4 = 0
-		last5 = 0
-		last6 = 0
-		last7 = 0
-	end
-	SKIN:Bang('!SetOption','TimeMeter','Shape2','Rectangle' .. math.min((last7)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000010|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape3','Rectangle' .. math.min((last6)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000020|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape4','Rectangle' .. math.min((last5)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000030|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape5','Rectangle' .. math.min((last4)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000040|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape6','Rectangle' .. math.min((last3)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000050|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape7','Rectangle' .. math.min((last2)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000060|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape8','Rectangle' .. math.min((last)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000070|StrokeWidth0')
-	last7 = last6
-	last6 = last5
-	last5 = last4
-	last4 = last3
-	last3 = last2
-	last2 = last
-	last=os.clock()-st3
-	SKIN:Bang('!SetOption','TimeMeter','Shape9','Rectangle' .. math.min((os.clock()-st3)/100*6*1000*500-15,495) .. ',0,30,8|FillColorFF000080|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape10','Rectangle' .. math.min((el)/100*6*1000*500-0.5,500) .. ',0,1,8|FillColor00FF00|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape11','Rectangle' .. math.min((el+el4)/100*6*1000*500-0.5,500) .. ',0,1,8|FillColor00FF00|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape12','Rectangle' .. math.min((el+el4+el2)/100*6*1000*500-0.5,500) .. ',0,1,8|FillColor00FF00|StrokeWidth0')
-	SKIN:Bang('!SetOption','TimeMeter','Shape13','Rectangle' .. math.min((frametime)/100*6*1000*500-1,500) .. ',0,2,8|FillColor00FFFF|StrokeWidth0')
-	SKIN:Bang('!SetOption','UpdateTime1','Text',string.format("%.2f",(el+el4+el2)*1000));
-	SKIN:Bang('!SetOption','UpdateTime2','Text',string.format("%.2f",frametime*1000));
-	--SKIN:Bang('!SetOption','UpdateTime','Text',string.format("%.3f",el*1000)..' / '..string.format("%.3f",el4*1000)..' / '..string.format("%.3f",el2*1000)..' | '..string.format("%.3f",(el+el4+el2)*1000)..' -> '..string.format("%.2f",el3*1000)..' | '..string.format("%.2f",frametime*1000)..' -> avgSize '..avgSize);
-	st3=os.clock()
-	if eli<49 then eli=eli+1 end
-	--timer
 	
 	--use frametime for adaptive avg size
 	--need to discard unused values!!!
@@ -465,6 +380,19 @@ function Update()
 				avgConst = 1/avgConst
 			end
 		end
+	end
+	
+	--use frametime for adaptive avg size
+	--need to discard unused values!!!
+	colorAvgSize=math.floor(math.max(math.min(1/frametime,avgTime),1)+0.5)
+	if colorAvgSize ~= colorAvgSizeOld then
+		if colorAvgSizeOld > colorAvgSize then
+			for i=colorAvgSize+1,colorAvgSizeOld do
+				colorAvg[i] = {}
+			end
+		end
+		colorAvgSizeOld = colorAvgSize
+		colorAvgConst = 1/colorAvgSize
 	end
 end
 function calibrate(duration)
