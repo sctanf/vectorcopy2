@@ -272,7 +272,7 @@ function Update()
 			bCalc[i] = b^power
 		end
 	end
-	table.insert(bAvg,k,bCalc)
+	bAvg[k] = bCalc
 	--for i=avgSize-1,1,-1 do
 	--	bAvg[i+1] = bAvg[i]
 	--end
