@@ -109,7 +109,7 @@ Channel=#Channel#
 	colorAvgConst = 1
 	colorAvgSizeOld = 0
 	colorAvgSize = 1
-	colorAvgIndex = 0
+	colorAvgTime = 1000
 	
 	colorSrc = {}
 	colorAvg = {}
@@ -135,7 +135,6 @@ Channel=#Channel#
 	avgSize = 1
 	avgTime = SKIN:GetVariable('AvgTime', 0)
 	avgBase = SKIN:GetVariable('AvgBase', 1)
-	avgIndex = 0
 	
 	calTime = 0
 	calIndex = 0
@@ -238,8 +237,6 @@ function Update()
 	
 	local c = {}
 	local bCalc = {}
-	avgIndex = (avgIndex + 1) % avgSize
-	k = avgIndex + 1
 	for i=1,bands do
 		local b = bSrc[i]:GetValue()
 		if bCal then
@@ -251,7 +248,8 @@ function Update()
 			bCalc[i] = b^power
 		end
 	end
-	bAvg[k] = bCalc
+	table.insert(bAvg,1,bCalc)
+	table.remove(bAvg,table.maxn(bAvg))
 	
 	local bMax = 0
 	if tonumber(avgSize) > 1 then
@@ -265,7 +263,6 @@ function Update()
 			elseif avgType == 2 then
 				for j=avgSize,1,-1 do
 					out = out + (bAvg[j][i] or 0) * j
-					k = k % avgSize + 1
 				end
 				out = out * avgConst
 			elseif avgType == 3 then
@@ -284,25 +281,25 @@ function Update()
 		end
 	else
 		for i=1,bands do
-			local out = bAvg[k][i]
+			local out = bAvg[1][i]
 			if out > bMax then bMax = out end
 		end
-		c = bAvg[k]
+		c = bAvg[1]
 	end
 	
 	local color = {}
-	colorAvgIndex = (colorAvgIndex + 1) % colorAvgSize
-	l = colorAvgIndex + 1
+	local colorCalc = {}
 	for i=1,3 do
-		color[i] = tonumber(colorSrc[i]:GetStringValue())
+		colorCalc[i] = tonumber(colorSrc[i]:GetStringValue())
 	end
-	colorAvg[l] = color
+	table.insert(colorAvg,1,colorCalc)
+	table.remove(colorAvg,table.maxn(colorAvg))
 	
 	if colorType == 2 then
 		for i=1,3 do
 			local out = 0
 			for j=colorAvgSize,1,-1 do
-				out = out + (colorAvg[j][i] or 0)
+				out = out + (colorAvg[j][i] or colorCalc[i])
 			end
 			color[i] = out * colorAvgConst
 		end
@@ -384,7 +381,7 @@ function Update()
 	
 	--use frametime for adaptive avg size
 	--need to discard unused values!!!
-	colorAvgSize=math.floor(math.max(math.min(1/frametime,avgTime),1)+0.5)
+	colorAvgSize=math.floor(math.max(math.min(colorAvgTime/1000/frametime,colorAvgTime),1)+0.5)
 	if colorAvgSize ~= colorAvgSizeOld then
 		if colorAvgSizeOld > colorAvgSize then
 			for i=colorAvgSize+1,colorAvgSizeOld do
