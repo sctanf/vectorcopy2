@@ -1,5 +1,5 @@
 function Initialize()
-	version = '010200'
+	version = '010201'
 	--parent and band templates
 	local parent = [=[
 [P]
@@ -242,7 +242,7 @@ function Update()
 				bCal[i] = bMax/bCal[i]..string.char(10)
 			end
 			local file = io.open(SKIN:GetVariable('CURRENTPATH') .. 'calibration.txt', 'w')
-			if not calCancel then file:write(version..string.char(10)..bands..string.char(10)..bMax..string.char(10)..table.concat(bCal)) end
+			if not calCancel then file:write(version..string.char(10)..bands..string.char(10)..bMax/calIndex..string.char(10)..table.concat(bCal)) end
 			file:close()
 		end
 		if volume then SKIN:Bang('!CommandMeasure Volume "SetVolume ' .. volume .. '"') end

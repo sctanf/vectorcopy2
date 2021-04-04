@@ -108,7 +108,7 @@ MaxSensitivity=-9
 
 ; Volume calibration target
 ; Real
-VolumeTarget=44.5
+VolumeTarget=0.93
 
 ; Use volume calibration (Right-click > Calibrate)
 ; Yes | No

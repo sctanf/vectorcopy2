@@ -104,11 +104,11 @@ MinSensitivity=-240
 
 ; Maximum band sensitivity
 ; Real, <= 0.0
-MaxSensitivity=-9
+MaxSensitivity=-6
 
 ; Volume calibration target
 ; Real
-VolumeTarget=44.5
+VolumeTarget=0.93
 
 ; Use volume calibration (Right-click > Calibrate)
 ; Yes | No
