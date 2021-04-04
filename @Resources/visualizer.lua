@@ -310,40 +310,41 @@ function Update()
 		SKIN:Bang('!DisableMeasure', 'Update')
 	else
 		SKIN:Bang('!EnableMeasure', 'Update')
-		if bMax < 1 then bMax = 1 end
-		SKIN:Bang('!SetOption', 'Shape', 'Color', 'FillColor' .. colorOut .. ',#Alpha#|StrokeWidth0')
-		if invert == 1 then
-			if visType == 1 then
-				local p = bar
-				local spacing = (barSpacing+barWidth)*scale
-				for i=1,bands do
-					p[2] = (i-1)*spacing
-					p[4] = (-baseHeight-(trueHeight)*c[bands+1-i]/bMax)*scale
-					SKIN:Bang('!SetOption', 'Shape', 'Shape' .. i+1, table.concat(p))
-				end
-			elseif visType == 2 then
-				local p = path
-				for i=1,bands do
-					p[i*2+1] = (trueHeight-trueHeight*c[bands+1-i]/bMax)*scale
-				end
-				SKIN:Bang('!SetOption', 'Shape', 'Path', table.concat(p))
+	end
+	
+	if bMax < 1 then bMax = 1 end
+	SKIN:Bang('!SetOption', 'Shape', 'Color', 'FillColor' .. colorOut .. ',#Alpha#|StrokeWidth0')
+	if invert == 1 then
+		if visType == 1 then
+			local p = bar
+			local spacing = (barSpacing+barWidth)*scale
+			for i=1,bands do
+				p[2] = (i-1)*spacing
+				p[4] = (-baseHeight-(trueHeight)*c[bands+1-i]/bMax)*scale
+				SKIN:Bang('!SetOption', 'Shape', 'Shape' .. i+1, table.concat(p))
 			end
-		else
-			if visType == 1 then
-				local p = bar
-				local spacing = (barSpacing+barWidth)*scale
-				for i=1,bands do
-					p[2] = (i-1)*spacing
-					p[4] = (-baseHeight-(trueHeight)*c[i]/bMax)*scale
-					SKIN:Bang('!SetOption', 'Shape', 'Shape' .. i+1, table.concat(p))
-				end
-			elseif visType == 2 then
-				local p = path
-				for i=1,bands do
-					p[i*2+1] = (trueHeight-trueHeight*c[i]/bMax)*scale
-				end
-				SKIN:Bang('!SetOption', 'Shape', 'Path', table.concat(p))
+		elseif visType == 2 then
+			local p = path
+			for i=1,bands do
+				p[i*2+1] = (trueHeight-trueHeight*c[bands+1-i]/bMax)*scale
 			end
+			SKIN:Bang('!SetOption', 'Shape', 'Path', table.concat(p))
+		end
+	else
+		if visType == 1 then
+			local p = bar
+			local spacing = (barSpacing+barWidth)*scale
+			for i=1,bands do
+				p[2] = (i-1)*spacing
+				p[4] = (-baseHeight-(trueHeight)*c[i]/bMax)*scale
+				SKIN:Bang('!SetOption', 'Shape', 'Shape' .. i+1, table.concat(p))
+			end
+		elseif visType == 2 then
+			local p = path
+			for i=1,bands do
+				p[i*2+1] = (trueHeight-trueHeight*c[i]/bMax)*scale
+			end
+			SKIN:Bang('!SetOption', 'Shape', 'Path', table.concat(p))
 		end
 	end
 	
