@@ -104,7 +104,19 @@ MinSensitivity=-240
 
 ; Maximum band sensitivity
 ; Real, <= 0.0
-MaxSensitivity=-6
+MaxSensitivity=-9
+
+; Volume calibration target
+; Real
+VolumeTarget=44.5
+
+; Use volume calibration (Right-click > Calibrate)
+; Yes | No
+NormalizeVolume=Yes
+
+; Use spectrum calibration (Right-click > Calibrate)
+; Yes | No
+NormalizeSpectrum=Yes
 
 ; ACCURACY
 ; ----------------------------------------
@@ -120,13 +132,6 @@ Cutoff1=0.54
 Cutoff2=0.25
 Cutoff3=0.20
 Cutoff4=0.15
-
-; Band group transition size
-; Real, 0.0 - 1.0
-Transition0=0.1
-Transition1=0.1
-Transition2=0.1
-need extra bands (if only the plugin lua pipe worked!)
 
 ; Band group accuracy
 ; Real, > 0.0
@@ -152,11 +157,6 @@ WindowFunction=Hann
 
 ; BAND CONTROL
 ; ----------------------------------------
-
-; Band blur
-; Effect of one band on surrounding bands
-; Real, >= 0.0
-Blur=0
 
 ; Exponential factor
 ; Gives louder bars more presence over quieter bars

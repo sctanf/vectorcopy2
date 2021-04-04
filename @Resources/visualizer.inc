@@ -1,9 +1,9 @@
 [Rainmeter]
-Update=16
+Update=50
 RightMouseUpAction=[!SkinCustomMenu]
-ContextTitle=Calibrate Fast
+ContextTitle=Calibrate Fast (5s)
 ContextAction=[!CommandMeasure Processor calibrate(5)][!SetOption Rainmeter ContextTitle "Cancel Calibration"][!SetOption Rainmeter ContextAction "[!CommandMeasure Processor calibrate(0)]"][!SetOption Rainmeter ContextTitle2 ""][!SkinCustomMenu]
-ContextTitle2=Calibrate Accurate
+ContextTitle2=Calibrate Accurate (30s)
 ContextAction2=[!CommandMeasure Processor calibrate(30)][!SetOption Rainmeter ContextTitle "Cancel Calibration"][!SetOption Rainmeter ContextAction "[!CommandMeasure Processor calibrate(0)]"][!SetOption Rainmeter ContextTitle2 ""][!SkinCustomMenu]
 ContextTitle3=Calibrate Manual
 ContextAction3=[!CommandMeasure Processor calibrate(-1)][!SetOption Rainmeter ContextTitle "Finish Calibration"][!SetOption Rainmeter ContextAction "[!CommandMeasure Processor calibrate(-1)]"][!SetOption Rainmeter ContextTitle2 "Cancel Calibration"][!SetOption Rainmeter ContextAction2 "[!CommandMeasure Processor calibrate(0)]"][!SetOption Rainmeter ContextTitle3 ""][!SkinCustomMenu]
@@ -21,6 +21,8 @@ ContextAction6=[!SkinMenu]
 [Update]
 Measure=Calc
 OnUpdateAction=[!Delay 0][!Update]
+UpdateDivider=-1
+Disabled=1
 
 [Desktop]
 Measure=Plugin
