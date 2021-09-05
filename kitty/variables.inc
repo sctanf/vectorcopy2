@@ -32,7 +32,7 @@ Chameleon=Foreground1
 ; Integer, 0 - 255
 Alpha=255
 
-; Visualizeer size multiplier
+; Visualizer size multiplier
 ; Real, >= 0.0
 Scale=1
 
