@@ -18,7 +18,7 @@ Type=Bar
 
 ; Color of the Visualizer
 ; Custom | Chameleon
-Color=Custom
+Color=Chameleon
 
 ; Custom color
 ; Integer, 0 - 255 each
@@ -104,7 +104,7 @@ MinSensitivity=-240
 
 ; Maximum band sensitivity
 ; Real, <= 0.0
-MaxSensitivity=-9
+MaxSensitivity=-24
 
 ; Volume calibration target
 ; Real, 0.0 - 1.0
@@ -112,18 +112,18 @@ VolumeTarget=0.95
 
 ; Use volume calibration (Right-click > Calibrate)
 ; Yes | No
-NormalizeVolume=Yes
+NormalizeVolume=No
 
 ; Use spectrum calibration (Right-click > Calibrate)
 ; Yes | No
-NormalizeSpectrum=Yes
+NormalizeSpectrum=No
 
 ; ACCURACY
 ; ----------------------------------------
 
 ; Band group count
 ; Integer, >= 1
-Groups=6
+Groups=5
 
 ; Band group cutoffs
 ; Real, 0.0 - 1.0
@@ -131,25 +131,22 @@ Cutoff0=0.71
 Cutoff1=0.54
 Cutoff2=0.25
 Cutoff3=0.20
-Cutoff4=0.15
 
 ; Band group accuracy
 ; Real, > 0.0
 Accuracy0=30
 Accuracy1=20
 Accuracy2=12
-Accuracy3=9
-Accuracy4=8
-Accuracy5=7
+Accuracy3=11
+Accuracy4=10
 
 ; Band group frame overlap
 ; Real, >= 1.0
 Overlap0=2
 Overlap1=3
 Overlap2=8
-Overlap3=12
-Overlap4=15
-Overlap5=15
+Overlap3=9
+Overlap4=10
 
 ; Method for processing FFT results
 ; None | Hann | Hamming | Kaiser | Exponential | Chebyshev
@@ -169,7 +166,7 @@ AvgType=Exponential
 
 ; Proc smoothing time in milliseconds
 ; Real, >= 0.0
-AvgTime=500
+AvgTime=0
 
 ; Proc smoothing factor (for Exponential smoothing type)
 ; Real, > 0.0
