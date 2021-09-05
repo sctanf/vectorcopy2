@@ -115,7 +115,7 @@ Channel=#Channel#
 	colorAvgSize = 1
 	colorAvgTime = 1000
 	
-	colorSrc = {}
+	colorSrc = SKIN:GetMeasure('C')
 	colorAvg = {}
 	
 	scale = SKIN:GetVariable('Scale', 1)
@@ -173,15 +173,7 @@ Channel=#Channel#
 		colorAvg[i] = {}
 	end
 	
-	for i=1,3 do
-		colorSrc[i] = SKIN:GetMeasure('C' .. i)
-	end
-	
-	if colorType == 1 then
-		colorOut = SKIN:GetVariable('Custom')
-	elseif colorType == 2 then
-		colorOut = colorSrc[1]:GetValue() .. ',' .. colorSrc[2]:GetValue() .. ',' ..colorSrc[3]:GetValue()
-	end
+	colorOut = SKIN:GetVariable('Custom')
 	SKIN:Bang('!SetOption', 'Shape', 'Color', 'FillColor' .. colorOut .. ',#Alpha#|StrokeWidth0')
 	
 	--initialize visualizer shape
@@ -371,9 +363,7 @@ function Update()
 	--get color
 	local color = {}
 	local colorCalc = {}
-	for i=1,3 do
-		colorCalc[i] = tonumber(colorSrc[i]:GetStringValue())
-	end
+	colorCalc[1],colorCalc[2],colorCalc[3] = hextocolors(colorSrc:GetStringValue() or 'ffffff')
 	table.insert(colorAvg,1,colorCalc)
 	table.remove(colorAvg,table.maxn(colorAvg))
 	
@@ -389,13 +379,13 @@ function Update()
 		colorOut = color[1] .. ',' .. color[2] .. ',' ..color[3]
 	end
 	
-	--save cpu if no audio is playing, and prevent too high framerate
-	if bMax < 1/1000 then
-		SKIN:Bang('!DisableMeasure', 'Update')
-	elseif frametimeAvg[1] > 0.004 then
-		SKIN:Bang('!EnableMeasure', 'Update')
-		SKIN:Bang('!UpdateMeasure', 'Update')
-	end
+--	--save cpu if no audio is playing, and prevent too high framerate
+--	if bMax < 1/1000 then
+--		SKIN:Bang('!DisableMeasure', 'Update')
+--	elseif frametimeAvg[1] > 0.004 then
+--		SKIN:Bang('!EnableMeasure', 'Update')
+--		SKIN:Bang('!UpdateMeasure', 'Update')
+--	end
 	
 	--apply values to meter
 	if bMax < 1 then bMax = 1 end
@@ -455,4 +445,7 @@ function calibrate(duration)
 		calStartTime = os.clock()
 		calibrating = 1
 	end
+end
+function hextocolors(hex)
+	return tonumber(string.sub(hex,1,2),16),tonumber(string.sub(hex,3,4),16),tonumber(string.sub(hex,5,6),16)
 end
