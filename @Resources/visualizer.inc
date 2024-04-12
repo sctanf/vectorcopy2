@@ -39,6 +39,12 @@ Plugin=Chameleon
 Parent=Desktop
 Color=#Chameleon#
 
+[Volume]
+Measure=Plugin
+Plugin=Win7AudioPlugin
+UpdateDivider=-1
+Disabled=1
+
 [Processor]
 Measure=Script
 ScriptFile=#@#visualizer.lua
